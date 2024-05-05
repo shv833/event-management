@@ -5,7 +5,6 @@ from .serializers import EventSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from django.core.exceptions import ObjectDoesNotExist
 from .permissions import IsAdminOrEventOwner
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
@@ -44,57 +43,51 @@ class EventRetrieveAPIView(generics.RetrieveAPIView):
     permission_classes = [AllowAny]
 
 
-class EventAttendAPIView(generics.UpdateAPIView):
+class EventUpdateAPIView(generics.UpdateAPIView):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    permission_classes = [IsAuthenticated, IsAdminOrEventOwner]
+
+
+class EventAttendAPIView(generics.CreateAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     permission_classes = [IsAuthenticated]
 
-    def update(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         event = self.get_object()
         user = self.request.user
 
-        try:
-            if event.attendees.filter(pk=user.pk).exists():
-                return Response({'message': 'User is already an attendee'}, status=status.HTTP_400_BAD_REQUEST)
+        if event.attendees.filter(pk=user.pk).exists():
+            return Response({'message': 'User is already an attendee'}, status=status.HTTP_400_BAD_REQUEST)
 
-            event.attendees.add(user)
+        event.attendees.add(user)
 
-            subject = 'Welcome for Event: {}'.format(event.title)
-            message = render_to_string('event_attendee_notification_email.html', {'user': user, 'event': event})
-            recipient_list = [user.email]
-            send_mail(subject, message, None, recipient_list)
+        subject = 'Welcome for Event: {}'.format(event.title)
+        message = render_to_string('event_attendee_notification_email.html', {'user': user, 'event': event})
+        recipient_list = [user.email]
+        send_mail(subject, message, None, recipient_list)
 
-            return Response({'message': 'User added to event attendees successfully'}, status=status.HTTP_200_OK)
-
-        except ObjectDoesNotExist:
-            return Response({'message': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'message': 'User added to event attendees successfully'}, status=status.HTTP_200_OK)
 
 
-class EventUnattendAPIView(generics.UpdateAPIView):
+class EventUnattendAPIView(generics.DestroyAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     permission_classes = [IsAuthenticated]
 
-    def update(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         event = self.get_object()
         user = self.request.user
 
-        try:
-            if not event.attendees.filter(pk=user.pk).exists():
-                return Response({'message': 'User is not an attendee of this event'},
-                                status=status.HTTP_400_BAD_REQUEST)
+        if not event.attendees.filter(pk=user.pk).exists():
+            return Response({'message': 'User is not an attendee of this event'}, status=status.HTTP_400_BAD_REQUEST)
 
-            event.attendees.remove(user)
+        event.attendees.remove(user)
 
-            subject = 'Unregister from Event: {}'.format(event.title)
-            message = render_to_string('event_unattendee_notification_email.html',
-                                       {'user': user, 'event': event})
-            recipient_list = [user.email]
-            send_mail(subject, message, None, recipient_list)
+        subject = 'Unregister from Event: {}'.format(event.title)
+        message = render_to_string('event_unattendee_notification_email.html', {'user': user, 'event': event})
+        recipient_list = [user.email]
+        send_mail(subject, message, None, recipient_list)
 
-            return Response({'message': 'User unregistered from event successfully'},
-                            status=status.HTTP_200_OK)
-
-        except Exception:
-            return Response({'message': 'An error occurred while unregistering user from event'},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'message': 'User unregistered from event successfully'}, status=status.HTTP_200_OK)
