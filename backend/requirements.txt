@@ -4,3 +4,4 @@ tzdata
 djangorestframework
 djangorestframework-simplejwt
 drf-spectacular
+django-filter

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',
     'events',
     'users',
 ]
@@ -153,11 +154,12 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Your Project API',
-    'DESCRIPTION': 'Your project description',
+    'TITLE': 'Event management API',
+    'DESCRIPTION': 'Simple event management',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
