@@ -21,12 +21,19 @@ class EventListAPIView(generics.ListAPIView):
     serializer_class = EventSerializer
     permission_classes = [AllowAny]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
-    filterset_fields = '__all__'
+    filterset_fields = [
+                    'title',
+                    'description',
+                    'date',
+                    'location',
+                    'organizer',
+                    ]
     search_fields = [
-                        'title',
-                        'description',
-                        'date',
-                        'location',]
+                    'title',
+                    'description',
+                    'date',
+                    'location',
+                    ]
     ordering_fields = ['date', 'title']
     ordering = ['date']
 
