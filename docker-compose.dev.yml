@@ -11,16 +11,16 @@ services:
       - db
     env_file:
       - .env.dev
-  front:
-    build: 
-      context: frontend
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./frontend/:/usr/src/frontend/
-    ports:
-      - 3000:3000
-    env_file:
-      - .env.dev
+  # front:
+  #   build: 
+  #     context: frontend
+  #     dockerfile: Dockerfile.dev
+  #   volumes:
+  #     - ./frontend/:/usr/src/frontend/
+  #   ports:
+  #     - 3000:3000
+  #   env_file:
+  #     - .env.dev
   db:
     image: postgres:12.2-alpine
     restart: always

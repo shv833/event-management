@@ -61,11 +61,11 @@ class EventAPITestCase(TestCase):
 
     def test_event_attend(self):
         url = reverse('event-attend', kwargs={'pk': self.event.pk})
-        response = self.client.put(url)
+        response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_event_unattend(self):
         self.event.attendees.add(self.user)
         url = reverse('event-unattend', kwargs={'pk': self.event.pk})
-        response = self.client.put(url)
+        response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

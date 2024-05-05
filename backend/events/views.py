@@ -73,7 +73,11 @@ class EventAttendAPIView(generics.CreateAPIView):
         subject = 'Welcome for Event: {}'.format(event.title)
         message = render_to_string('event_attendee_notification_email.html', {'user': user, 'event': event})
         recipient_list = [user.email]
-        send_mail(subject, message, None, recipient_list)
+
+        try:
+            send_mail(subject, message, None, recipient_list)
+        except:
+            pass
 
         return Response({'message': 'User added to event attendees successfully'}, status=status.HTTP_200_OK)
 
