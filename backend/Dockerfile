@@ -7,7 +7,13 @@ WORKDIR /usr/src/backend
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-RUN apk add --no-cache gettext
+
+RUN apk add --no-cache gettext curl gcc g++ make
+
+# Install Rust using Rustup installer script
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
 
 # Install server packages
 RUN apk update \

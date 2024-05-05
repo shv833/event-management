@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 '''
 
 from pathlib import Path
+from datetime import timedelta
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -19,6 +20,7 @@ BASE_DIR = PROJECT_DIR.parent
 
 # print(f'project dir:\n {os.listdir(PROJECT_DIR)}')
 # print(f'base dir:\n {os.listdir(BASE_DIR)}')
+
 
 def optional(key, default=None):
     return os.environ.get(key, default)
@@ -45,6 +47,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_spectacular',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'events',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -140,3 +147,35 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Your Project API',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
+}
+
+AUTH_USER_MODEL = 'users.CustomUser'
+APPEND_SLASH = True
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = optional("EMAIL_HOST")
+EMAIL_PORT = optional("EMAIL_PORT")
+EMAIL_HOST_USER = optional("EMAIL_USER")
+EMAIL_HOST_PASSWORD = optional("EMAIL_PASS")
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_SENDER = optional("EMAIL_SENDER", EMAIL_HOST_USER)
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
